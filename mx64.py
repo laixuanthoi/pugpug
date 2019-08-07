@@ -68,7 +68,7 @@ class Mx64:
             for id, val in zip(idx, valx):
                 self.groupSyncWrite.addParam(id, [val])
         self.groupSyncWrite.txPacket()
-        
+
     def getPresentPosition(self, id):
         return self.packetHandler.read4ByteTxRx(self.portHandler, id, 132)[0]
 
@@ -101,7 +101,7 @@ class Mx64:
         self.packetHandler.write4ByteTxOnly(self.portHandler, id, 48, maxPos)
     
     def setDriveMode(self, id, mode):
-        self.packetHandler.write1ByteTxOnly(self.portHandler, id, 10, 1)
+        self.packetHandler.write1ByteTxOnly(self.portHandler, id, 10, mode)
 
 # mx = Mx64('COM5')
 # mx.setNTorqueEnable([1,2,3,4,5,6,7,8], [1,1,1,1,1,1,1,1])

@@ -1,7 +1,7 @@
 from mx64 import Mx64
-from control.trotting import Trotting
 from kinematic import Kinematic
 from math import *
+from time import *
 
 RC_0 = 7
 RC_1 = 8
@@ -32,33 +32,57 @@ class Pug:
                             (0,0,0),
                             (0,0,0),
                             (0,0,0)]
-        
+    
+    def doichieudongco(self, z):
+        mx.setNTorqueEnable(self.legID, [[0,0],[0,0],[0,0],[0,0]])
+        mx.setDriveMode(RC_1, z)
+        mx.setDriveMode(RC_3, z)
+        mx.setDriveMode(RC_5, z)
+        mx.setDriveMode(RC_7, z)
+        mx.setDriveMode(RC_0, not z)
+        mx.setDriveMode(RC_2, not z)
+        mx.setDriveMode(RC_4, not z)
+        mx.setDriveMode(RC_6, not z)
+        mx.setNTorqueEnable(self.legID, [[1,1],[1,1],[1,1],[1,1]])
+
     def setup(self):
         #------doi chieu dong co---------
-        mx.setDriveMode(RC_1, True)
-        mx.setDriveMode(RC_3, False)
-        mx.setDriveMode(RC_5, False)
-        mx.setDriveMode(RC_7, False)
+        self.doichieudongco(False)
         
     def standing(self):
         mx.setNTorqueEnable(self.legID, [[1,1],[1,1],[1,1],[1,1]])
-        P0 = (-45, 260, 0)
-        rad1, rad2, rad3 = kinematic.legIK(P0)
-
-        angle1, angle2, angle3 = (abs(degrees(rad1)), 180 - abs(degrees(rad2)), 180 - abs(degrees(rad3)))
-        arrAngle = [[angle2, angle3],
-                    [angle2, angle3],
-                    [angle2, angle3],
-                    [angle2, angle3]]
-        
-        print(degrees(rad1),degrees(rad2), degrees(rad3))
-        # mx.setNGoalAngle(self.legID, arrAngle)
-        # mx.setGoalAngle()
-        # mx.setNGoalAngle([self.legID[0]], [[angle2, angle3]])
-        # mx.setGoalAngle(7, 250)
+        P0 = (0, 220, 0)
+        theta2, theta3 = kinematic.legIK2dof(P0)
+        arrAngle = [   [theta2, theta3],
+            [theta2, theta3],
+            [theta2, theta3],
+            [theta2, theta3]]
+        mx.setNGoalAngle(self.legID, arrAngle)
+        # mx.setGoalAngle(self.legID[1][0], theta2)
+        # mx.setGoalAngle(self.legID[1][1], theta3)
+    
+    def trotting(self):
+        mx.setNTorqueEnable(self.legID, [[1,1],[1,1],[1,1],[1,1]])
+        from control.trotting import Trotting
+        tt = Trotting()
+        rTime = time()*1000
+        while time()*1000 - rTime < 3000:
+            diff = time()*1000 - rTime
+            dt1 = diff % tt.sumT
+            dt2 = (diff - (tt.t1 + tt.t2)) % tt.sumT
+            
+            arrAngle = [    kinematic.legIK2dof(tt.calLegs(dt1)),
+            kinematic.legIK2dof(tt.calLegs(dt2)),
+            kinematic.legIK2dof(tt.calLegs(dt1)),
+            kinematic.legIK2dof(tt.calLegs(dt2))]
+            mx.setNGoalAngle(self.legID, arrAngle)
+            sleep(0.001)
+            
 
 pug = Pug()
-pug.setup()
-pug.standing()
+# pug.setup()
+# pug.standing()
+
+pug.trotting()
 
         
