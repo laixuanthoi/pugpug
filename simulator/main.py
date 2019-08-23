@@ -14,7 +14,6 @@ thread_joy = Thread(target=joy.loop, args=(lambda:stop_threading,mutex))
 thread_joy.start()
 
 #SIMULATOR
-kinematic.setupView(200).view_init(elev=12., azim=28)
 
 
 while time.time() - rTime < 5:

@@ -20,6 +20,7 @@ def setup():
     
 def loop(stop, mutex):
     global joy_axis, joy_button, joy_hat
+    #khoa luong`
     mutex.acquire(1)
     while not stop():
         for event in pygame.event.get():

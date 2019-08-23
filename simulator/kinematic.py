@@ -1,28 +1,10 @@
-from mpl_toolkits import mplot3d
 import numpy as np
 from math import *
-import random
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from mpl_toolkits.mplot3d import Axes3D
-
-fig = plt.figure()
-data = np.random.rand(2, 25)
-
-def setupView(limit):
-    ax = plt.axes(projection="3d")
-    ax.set_xlim(-limit, limit)
-    ax.set_ylim(-limit, limit)
-    ax.set_zlim(-limit, limit)
-    ax.set_xlabel("X")
-    ax.set_ylabel("Z")
-    ax.set_zlabel("Y")
-    return ax
 
 class Kinematic:
 
     def __init__(self):
-        self.l1=0
+        self.l1=10
         self.l2=0
         self.l3=80
         self.l4=80
@@ -30,7 +12,10 @@ class Kinematic:
         self.L = 150
         self.W = 100
 
-    def bodyIK(self,omega,phi,psi,xm,ym,zm):
+        self.Ix = np.array([[-1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+        self.FP = [0,0,0,1]
+
+    def bodyIK(self,omega,psi,phi,xm,ym,zm):
         Rx = np.array([[1,0,0,0],
                     [0,np.cos(omega),-np.sin(omega),0],
                     [0,np.sin(omega),np.cos(omega),0],[0,0,0,1]])
@@ -89,9 +74,18 @@ class Kinematic:
         return np.array([T0,T1,T2,T3,T4])
 
     def drawLegPoints(self,p):
-        plt.plot([x[0] for x in p],[x[2] for x in p],[x[1] for x in p], 'k-', lw=3)
-        plt.plot([p[0][0]],[p[0][2]],[p[0][1]],'bo',lw=2)
-        plt.plot([p[4][0]],[p[4][2]],[p[4][1]],'ro',lw=2)
+        global pEnd, pStart, lnLeg
+        # plt.plot([x[0] for x in p],[x[2] for x in p],[x[1] for x in p], 'k-', lw=3)
+        # plt.plot([p[0][0]],[p[0][2]],[p[0][1]],'bo',lw=2)
+        # plt.plot([p[4][0]],[p[4][2]],[p[4][1]],'ro',lw=2)
+        # lnLeg.set_data([x[0] for x in p],[x[2] for x in p])
+        # lnLeg.set_3d_properties([x[1] for x in p])
+
+        # pStart.set_data([p[0][0]],[p[0][2]])
+        # pStart.set_3d_properties([p[0][1]])
+
+        # pEnd.set_data([p[4][0]],[p[4][2]])
+        # pEnd.set_3d_properties([p[4][1]])
 
     def drawLegPair(self,Tl,Tr,Ll,Lr):
         Ix=np.array([[-1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
@@ -107,7 +101,9 @@ class Kinematic:
         CP=[x.dot(FP) for x in [Tlf,Trf,Tlb,Trb]]
 
         CPs=[CP[x] for x in [0,1,3,2,0]]
-        plt.plot([x[0] for x in CPs],[x[2] for x in CPs],[x[1] for x in CPs], 'bo-', lw=2)
+        # plt.plot([x[0] for x in CPs],[x[2] for x in CPs],[x[1] for x in CPs], 'bo-', lw=2)
+        # lnBody.set_data([x[0] for x in CPs],[x[2] for x in CPs])
+        # lnBody.set_3d_properties([x[1] for x in CPs])
 
         self.drawLegPair(Tlf,Trf,Lp[0],Lp[1])
         self.drawLegPair(Tlb,Trb,Lp[2],Lp[3])
@@ -115,32 +111,10 @@ class Kinematic:
     def calcIK(self,Lp,angles,center):
         (omega,phi,psi)=angles
         (xm,ym,zm)=center
-        
         (Tlf,Trf,Tlb,Trb)= self.bodyIK(omega,phi,psi,xm,ym,zm)
-
         Ix = np.array([[-1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+
         return np.array([self.legIK(np.linalg.inv(Tlf).dot(Lp[0])),
         self.legIK(Ix.dot(np.linalg.inv(Trf).dot(Lp[1]))),
         self.legIK(np.linalg.inv(Tlb).dot(Lp[2])),
         self.legIK(Ix.dot(np.linalg.inv(Trb).dot(Lp[3])))])
-
-
-def init():
-    setupView(200).view_init(elev=12., azim=28)
-    Lp=np.array([[100,-100,50,1],   [100,-100,-50,1],
-                    [-100,-100,50,1],  [-100,-100,-50,1]])
-    Kinematic().drawRobot(Lp,(0,0,0),(0,0,0))
-
-def func_animate(i):
-    Lp=np.array([[100+i,-100,50,1],   [100,-100,-50,1],
-                    [-100,-100,50,1],  [-100,-100,-50,1]])
-    Kinematic().drawRobot(Lp,(0,0,0),(0,0,0))
-    
-
-ani = animation.FuncAnimation(fig, func_animate, init_func=init, interval=1)
-
-plt.show()
-# if __name__=="__main__":
-    # print(Kinematic().calcIK(Lp, (0,0,0), (0,0,0)))
-    
-
