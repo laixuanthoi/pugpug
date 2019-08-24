@@ -4,6 +4,8 @@ import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np 
 from kinematic import Kinematic
+from threading import Thread, Lock
+
 
 fig = plt.figure()
 
@@ -21,11 +23,18 @@ def init():
     return lnBody,lf_ln,rf_ln,lb_ln,rb_ln,lf_pStart,rf_pStart,lb_pStart,rb_pStart,lf_pEnd,rf_pEnd,lb_pEnd,rb_pEnd,
 
 
+ROLL = 0.0
+PITCH = 0.0
+YAW = 0.0
+
+LegPoint = [[20,-100,50,1],   [100,-100,-50,1],
+            [-100,-100,50,1],  [-100,-100,-50,1]]
+
 def update(i):
-       Lp=np.array([[100,-100,50,1],   [100,-100,-50,1],
-                [-100,-100,50,1],  [-100,-100,-50,1]])
+       global ROLL, PITCH, YAW
+       Lp=np.array(LegPoint)
        
-       (roll, pitch, yaw) = (0,0,0)
+       (roll, pitch, yaw) = (ROLL,PITCH,YAW)
 
        #center
        (x,y,z) = (0,0,0)
@@ -116,5 +125,3 @@ rb_pStart, = plt.plot([],[],[],'bo',lw=2, animated=True)
 rb_pEnd, = plt.plot([],[],[],'ro',lw=2, animated=True)
 
 leg_animated = animation.FuncAnimation(fig, update, init_func=init, interval=1, blit=True)
-
-plt.show()

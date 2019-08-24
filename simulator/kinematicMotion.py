@@ -43,7 +43,6 @@ class KinematicLegMotion:
         return self.LLp
 
 class KinematicMotion:
-
     def __init__(self,Lp):
         self.Lp=Lp
         self.legs=[KinematicLegMotion(Lp[x]) for x in range(4)]

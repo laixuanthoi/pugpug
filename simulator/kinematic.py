@@ -4,7 +4,7 @@ from math import *
 class Kinematic:
 
     def __init__(self):
-        self.l1=10
+        self.l1=0
         self.l2=0
         self.l3=80
         self.l4=80
