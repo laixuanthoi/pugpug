@@ -611,7 +611,6 @@ class Protocol2PacketHandler(object):
 
     def writeTxOnly(self, port, dxl_id, address, length, data):
         txpacket = [0] * (length + 12)
-
         txpacket[PKT_ID] = dxl_id
         txpacket[PKT_LENGTH_L] = DXL_LOBYTE(length + 5)
         txpacket[PKT_LENGTH_H] = DXL_HIBYTE(length + 5)
