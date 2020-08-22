@@ -1,11 +1,8 @@
 import numpy as np 
 
 class Trotting:
-    def __init__(self):
-        self.Sl = 120 #step length
-        self.Sh = 60 #step height
-        self.Sw = 0 #step width
-
+    def __init__(self, cfg):
+        self.Sl, self.Sh, self.Sw = cfg.config_trotting() #step_length, step_height, step_width
         self.t0 = 100
         self.t1 = 150
         self.t2 = 50
@@ -17,7 +14,6 @@ class Trotting:
         self.P2 = (self.P1[0] + self.Sl, self.P1[1] - self.Sh, 0)
         self.P3 = (self.P2[0], self.P2[1] + self.Sh, 0)
 
-    
     def calLegs(self, t):
         if t < 0:
             return self.P0
